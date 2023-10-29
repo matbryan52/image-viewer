@@ -9,7 +9,7 @@ Integrates into Jupyter using
 
 Launch via Binder:
 
-https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=%2Fimage-viewer%2Fapp
+`<https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=/image-viewer/app>`_
 
 .. image:: https://mybinder.org/badge_logo.svg
  :target: https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=%2Fimage-viewer%2Fapp
