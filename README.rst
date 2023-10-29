@@ -34,7 +34,7 @@ Directly load an image from an URL:
 Notes
 -----
 
-- Load directly from file on the server, or URL
+- Load directly from file on the server, or external URL, via url-arguments (:code:`?url=`, :code:`?path=`)
 - Image reading delegated to :code:`skimage.io.imread` but easy to extend
 - Image display downsampling enabled by default above a certain size
 - Image toolbox (adjustable color map etc)
