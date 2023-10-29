@@ -1,42 +1,9 @@
-import pathlib
-import urllib.parse
-
 import numpy as np
 import panel as pn
-from bokeh.plotting import figure
-from skimage.io import imread
 
-from libertem_ui.display.image_db import BokehImage
-from libertem_ui.live_plot import adapt_figure
-
-
-class LoadException(RuntimeError):
-    ...
-
-
-def default_image() -> tuple[np.ndarray, dict]:
-    shape = (480, 640)
-    return (
-        np.random.uniform(size=shape).astype(np.float32),
-        {'info': 'Default image'},
-    )
-
-
-def load_local(url_hash) -> tuple[np.ndarray, dict]:
-    # token auth key breaks path inference
-    # when launching via binder this is appended
-    # to the URL path so we can split using *_
-    path, *_ = url_hash.split('&token=')
-    path_parts = path.split('=')
-    path = '='.join(path_parts[1:])
-    path = urllib.parse.unquote(path)
-    path = pathlib.Path(path).expanduser().resolve()
-    array = imread(path, as_gray=True)
-    return array, {'info': str(path)}
-
-
-def load_url(url_hash) -> tuple[np.ndarray, dict]:
-    raise load_local(url_hash)
+from image_viewer.components import (
+    load_local, load_url, LoadException, default_image, ApertureFigure
+)
 
 
 def load_image() -> tuple[np.ndarray, dict]:
@@ -66,19 +33,16 @@ def viewer():
     header_md = pn.pane.Markdown(object="""
 # Image viewer""")
 
-    array, _ = load_image()
-    fig = figure()
-    img = (
-        BokehImage
-        .new()
-        .from_numpy(array)
+    array, meta = load_image()
+    figure = ApertureFigure.new(
+        array,
+        title=meta.get('title', None),
     )
-    img.on(fig)
-    adapt_figure(fig, array.shape, maxdim=600)
-
+    figure.add_hover_position_text()
+    figure.add_control_panel()
     return pn.Column(
         header_md,
-        pn.pane.Bokeh(fig),
+        figure.layout,
     )
 
 
