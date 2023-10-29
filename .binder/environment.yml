@@ -5,7 +5,7 @@ dependencies:
   - pip
   - git
   - nodejs
-  - jupyter_server_proxy
+  - jupyter-server-proxy
   - panel
   - pip:
-    - git+https://github.com/matbryan52/image-viewer.git
+    - git+https://github.com/LiberTEM/LiberTEM-panel-ui
