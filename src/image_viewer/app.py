@@ -23,10 +23,12 @@ def default_image() -> tuple[np.ndarray, dict]:
 
 
 def load_local(url_hash) -> tuple[np.ndarray, dict]:
-    parts = url_hash.split('=')
-    path = '='.join(parts[1:])
     # token auth key breaks path inference
-    path, *_ = path.split('&token=')
+    # when launching via binder this is appended
+    # to the URL path so we can split using *_
+    path, *_ = url_hash.split('&token=')
+    path_parts = path.split('=')
+    path = '='.join(path_parts[1:])
     path = urllib.parse.unquote(path)
     path = pathlib.Path(path).expanduser().resolve()
     array = imread(path, as_gray=True)
