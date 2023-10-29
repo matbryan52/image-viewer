@@ -18,3 +18,7 @@ Launch via Binder:
 Directly load an image from the :code:`data` directory:
 
 `<https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=/image-viewer/app?path=./data/logo.png>`_
+
+.. image:: https://mybinder.org/badge_logo.svg
+ :target: https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=/image-viewer/app?path=./data/logo.png
+ 
