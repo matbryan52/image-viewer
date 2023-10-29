@@ -11,5 +11,8 @@ def setup_proxy_config():
             "--allow-websocket-origin=*",
             "--port",
             "{port}",
-        ]
+        ],
+        "launcher_entry": {
+            "enabled": False,
+        }
     }
