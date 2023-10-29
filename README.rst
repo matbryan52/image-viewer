@@ -17,4 +17,4 @@ https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=%2Fimage-viewer%
 
 Directly load an image from the :code:`data` directory:
 
-https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=%2Fimage-viewer%2Fapp?path=./data/logo.png
+`<https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=/image-viewer/app?path=./data/logo.png>`_
