@@ -22,13 +22,17 @@ def default_image() -> tuple[np.ndarray, dict]:
     )
 
 
-def load_local(url_hash) -> tuple[np.ndarray, dict]:
+def extract_uri(url_hash):
     # token auth key breaks path inference
     # when launching via binder this is appended
     # to the URL path so we can split using *_
     path, *_ = url_hash.split('&token=')
     path_parts = path.split('=')
-    path = '='.join(path_parts[1:])
+    return '='.join(path_parts[1:])
+
+
+def load_local(url_hash) -> tuple[np.ndarray, dict]:
+    path = extract_uri(url_hash)
     path = urllib.parse.unquote(path)
     path = pathlib.Path(path).expanduser().resolve()
     array = imread(path, as_gray=True)
@@ -36,7 +40,12 @@ def load_local(url_hash) -> tuple[np.ndarray, dict]:
 
 
 def load_url(url_hash) -> tuple[np.ndarray, dict]:
-    raise NotImplementedError
+    url = extract_uri(url_hash)
+    # scikit-image can read directly from URL to greyscale numpy
+    array = imread(url, as_gray=True)
+    components = urllib.parse.urlsplit(url)
+    title = components.path.split('/')[-1]
+    return array, {'url': url, 'title': title}
 
 
 class ApertureFigure:
