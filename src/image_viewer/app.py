@@ -46,4 +46,4 @@ def viewer():
     )
 
 
-viewer().servable()
+viewer().servable(title='Image viewer')
