@@ -1,4 +1,4 @@
-Image viewer
+Image Viewer
 ============
 
 Demonstrate use of `LiberTEM-panel-ui <https://github.com/LiberTEM/LiberTEM-panel-ui>`_
