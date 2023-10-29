@@ -7,7 +7,7 @@ to build a simple image viewer application.
 Integrates into Jupyter using
 `jupyter-server-proxy <https://github.com/jupyterhub/jupyter-server-proxy>`_.
 
-Launch via Binder:
+Launch via Binder with default image:
 
 `<https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=/image-viewer/app>`_
 
@@ -38,8 +38,8 @@ Notes
 - Image downsampling enabled by default
 - Image toolbox (adjustable color map etc)
 - Multi-channel images are effectively implemented just need some upstream refactoring
-- RGB(A) colour image support possible, but neds work to have downsampling in this mode
-- The page is a normal :code:`Panel`` layout so can add text / metadata display freely.
+- RGB(A) colour image support possible, but needs work to have downsampling in this mode
+- The page is a normal :code:`Panel` layout so can add text / metadata display freely
 - The same base could be used for a 4D-STEM viewer or Spectrum viewer
   based on what is already implemented in :code:`LiberTEM-panel-ui`. This is
   a minimal example which only displays a 2D greyscale image.
