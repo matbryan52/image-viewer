@@ -35,7 +35,8 @@ Notes
 -----
 
 - Load directly from file on the server, or URL
-- Image downsampling enabled by default above a certain size
+- Image reading delegated to :code:`skimage.io.imread` but easy to extend
+- Image display downsampling enabled by default above a certain size
 - Image toolbox (adjustable color map etc)
 - Multi-channel images (stacks) are effectively implemented just need some upstream refactoring
 - RGB(A) colour image support is possible, but needs work to have downsampling in this mode
