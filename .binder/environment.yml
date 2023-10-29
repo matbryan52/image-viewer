@@ -1,0 +1,11 @@
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - git
+  - nodejs
+  - jupyter_server_proxy
+  - panel
+  - pip:
+    - git+https://github.com/matbryan52/image-viewer.git
