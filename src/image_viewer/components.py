@@ -42,6 +42,8 @@ def load_local(url_hash) -> tuple[np.ndarray, dict]:
 def load_url(url_hash) -> tuple[np.ndarray, dict]:
     url = extract_uri(url_hash)
     # scikit-image can read directly from URL to greyscale numpy
+    # but it can't handle escaped urls ?
+    url = urllib.parse.unquote(url)
     array = imread(url, as_gray=True)
     components = urllib.parse.urlsplit(url)
     title = components.path.split('/')[-1]
