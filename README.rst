@@ -30,6 +30,12 @@ Directly load an image from an URL:
 .. image:: https://mybinder.org/badge_logo.svg
  :target: https://mybinder.org/v2/gh/matbryan52/image-viewer/HEAD?urlpath=/image-viewer/app?url=https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/RedCat_8727.jpg/1200px-RedCat_8727.jpg
 
+Development server
+------------------
+
+.. code-block:: console
+
+    $ panel serve src/image_viewer/app.py --port 9123 --autoreload
 
 Notes
 -----
