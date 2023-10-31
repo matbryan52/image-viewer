@@ -19,5 +19,6 @@ setuptools.setup(
         "libertem_ui@git+https://github.com/LiberTEM/LiberTEM-panel-ui",
         "panel",
         "bokeh",
+        "rosettasciio",
     ],
 )
