@@ -1,9 +1,11 @@
 import pathlib
+import importlib
 import urllib.parse
 
 import panel as pn
 from bokeh.plotting import figure
 from skimage.io import imread
+from rsciio import IO_PLUGINS
 import numpy as np
 
 from libertem_ui.display.image_db import BokehImage
@@ -31,11 +33,35 @@ def extract_uri(url_hash):
     return '='.join(path_parts[1:])
 
 
+def plugin_def_for_path(path: pathlib.Path):
+    ext = path.suffix[1:]
+    for plugin in IO_PLUGINS:
+        if ext in plugin['file_extensions']:
+            return plugin
+    raise LoadException(f"unknown file extension: {ext}")
+
+
+def load_rsciio(path: pathlib.Path):
+    print(f"loading from {path}")
+    plugin = plugin_def_for_path(path)
+    mod = importlib.import_module(plugin['api'])
+    result = mod.file_reader(path)
+    print(f"{mod}")
+    if isinstance(result, list):
+        result = result[0]  # WTF
+    return result['data']
+
+
 def load_local(url_hash) -> tuple[np.ndarray, dict]:
     path = extract_uri(url_hash)
     path = urllib.parse.unquote(path)
     path = pathlib.Path(path).expanduser().resolve()
-    array = imread(path, as_gray=True)
+    try:
+        array = load_rsciio(path)
+    except Exception as e:
+        print(e)
+        raise
+    # array = imread(path, as_gray=True)
     return array, {'path': str(path), 'title': path.name}
 
 
