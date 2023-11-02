@@ -14,7 +14,7 @@ class LoadException(RuntimeError):
 
 
 def default_image() -> tuple[np.ndarray, dict]:
-    shape = (480, 640)
+    shape = (480, 640, 5)
     return (
         np.random.uniform(size=shape).astype(np.float32),
         {'title': 'Default image'},
