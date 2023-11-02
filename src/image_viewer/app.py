@@ -31,10 +31,14 @@ def load_image() -> tuple[np.ndarray, dict]:
 
 
 def viewer():
-    header_md = pn.pane.Markdown(object="""
-# Image viewer""")
-
     array, meta = load_image()
+
+    header_md = pn.pane.Markdown(object=f"""
+# Image viewer
+
+**File**: {meta.get('path', None)}
+""")
+
     figure = ApertureFigure.new(
         array,
         title=meta.get('title', None),
