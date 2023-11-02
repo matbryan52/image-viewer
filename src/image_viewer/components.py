@@ -41,6 +41,9 @@ def plugin_def_for_path(path: pathlib.Path):
 def load_rsciio(path: pathlib.Path):
     print(f"loading from {path}")
     plugin = plugin_def_for_path(path)
+    if plugin['name'] == 'Image':
+        # Simplifies handling of custom RGBA dtype
+        return imread(path, as_gray=True)
     mod = importlib.import_module(plugin['api'])
     result = mod.file_reader(path)
     print(f"{mod}")
@@ -55,8 +58,6 @@ def load_local(url_hash) -> tuple[np.ndarray, dict]:
     path = pathlib.Path(path).expanduser().resolve()
     try:
         array = load_rsciio(path)
-    except LoadException as e:
-        array = imread(path, as_gray=True)
     except Exception as e:
         print(e)
         raise
