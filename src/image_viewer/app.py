@@ -1,8 +1,9 @@
 import numpy as np
 import panel as pn
 
+from libertem_ui.live_plot import ApertureFigure
 from image_viewer.components import (
-    load_local, load_url, LoadException, default_image, ApertureFigure
+    load_local, load_url, LoadException, default_image,
 )
 
 
