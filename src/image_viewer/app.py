@@ -39,8 +39,6 @@ def viewer():
         array,
         title=meta.get('title', None),
     )
-    figure.add_hover_position_text()
-    figure.add_control_panel()
     return pn.Column(
         header_md,
         figure.layout,
