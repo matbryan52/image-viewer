@@ -35,7 +35,7 @@ Development server
 
 .. code-block:: console
 
-    $ panel serve src/image_viewer/app.py --port 9123 --autoreload
+    $ panel serve src/image_viewer/app.py --port 9123 --dev
 
 Notes
 -----
