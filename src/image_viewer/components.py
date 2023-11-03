@@ -43,13 +43,44 @@ def load_rsciio(path: pathlib.Path):
     plugin = plugin_def_for_path(path)
     if plugin['name'] == 'Image':
         # Simplifies handling of custom RGBA dtype
-        return imread(path, as_gray=True)
+        return imread(path, as_gray=True), None
     mod = importlib.import_module(plugin['api'])
     result = mod.file_reader(path)
-    print(f"{mod}")
     if isinstance(result, list):
         result = result[0]  # WTF
-    return result['data']
+    return result['data'], result['axes']
+
+
+def slice_into_channels(data: np.ndarray, axes: list[dict] | None) -> list[np.ndarray]:
+    if axes is None or not any(axis['navigate'] for axis in axes):
+        yield data
+    index_to_axis = {
+        axis['index_in_array']: axis
+        for axis in axes
+    }
+
+    # idea: slice `data` like this: build slicing items like
+    # (x, y, :, :)
+    # where each non-navigate axis is a `:`, the others are iterated over
+    # using `ndindex`
+
+    ndindex_shape = []
+    for idx, s in enumerate(data.shape):
+        axis = index_to_axis[idx]
+        if axis['navigate']:
+            ndindex_shape.append(s)
+
+    for idx_tuple in np.ndindex(*tuple(ndindex_shape)):
+        idx_lst = list(idx_tuple)
+        slice_ = []
+        for idx in range(len(index_to_axis)):
+            axis = index_to_axis[idx]
+            if axis['navigate']:
+                slice_.append(idx_lst[0])
+                idx_lst = idx_lst[1:]
+            else:
+                slice_.append(slice(None, None, None))
+        yield data[tuple(slice_)]
 
 
 def load_local(url_hash) -> tuple[np.ndarray, dict]:
@@ -57,11 +88,12 @@ def load_local(url_hash) -> tuple[np.ndarray, dict]:
     path = urllib.parse.unquote(path)
     path = pathlib.Path(path).expanduser().resolve()
     try:
-        array = load_rsciio(path)
+        array, axes = load_rsciio(path)
+        print(f'loaded array of shape {array.shape} dtype {array.dtype}')
     except Exception as e:
         print(e)
         raise
-    return array, {'path': str(path), 'title': path.name}
+    return list(slice_into_channels(array, axes)), {'path': str(path), 'title': path.name}
 
 
 def load_url(url_hash) -> tuple[np.ndarray, dict]:
