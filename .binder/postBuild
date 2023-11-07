@@ -1,1 +1,4 @@
 pip install --no-deps .
+cd proxy_config
+pip install --no-deps .
+cd ..
