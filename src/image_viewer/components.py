@@ -21,15 +21,6 @@ def default_image() -> tuple[np.ndarray, dict]:
     )
 
 
-def extract_uri(url_hash):
-    # token auth key breaks path inference
-    # when launching via binder this is appended
-    # to the URL path so we can split using *_
-    path, *_ = url_hash.split('&token=')
-    path_parts = path.split('=')
-    return '='.join(path_parts[1:])
-
-
 def plugin_def_for_path(path: pathlib.Path):
     ext = path.suffix[1:]
     for plugin in IO_PLUGINS:
@@ -62,8 +53,7 @@ def channel_dim_from_axes(axes: list[dict] | None):
     )
 
 
-def load_local(url_hash) -> tuple[np.ndarray, dict]:
-    path = extract_uri(url_hash)
+def load_local(path: str) -> tuple[np.ndarray, dict]:
     path = urllib.parse.unquote(path)
     path = pathlib.Path(path).expanduser().resolve()
     try:
@@ -80,8 +70,7 @@ def load_local(url_hash) -> tuple[np.ndarray, dict]:
     return array, meta
 
 
-def load_url(url_hash) -> tuple[np.ndarray, dict]:
-    url = extract_uri(url_hash)
+def load_url(url: str) -> tuple[np.ndarray, dict]:
     # scikit-image can read directly from URL to greyscale numpy
     # but it can't handle escaped urls ?
     url = urllib.parse.unquote(url)
