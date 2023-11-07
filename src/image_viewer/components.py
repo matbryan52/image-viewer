@@ -4,8 +4,6 @@ import pathlib
 import importlib
 import urllib.parse
 
-import panel as pn
-from bokeh.plotting import figure
 from skimage.io import imread
 from rsciio import IO_PLUGINS
 import numpy as np
