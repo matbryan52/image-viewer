@@ -1,3 +1,5 @@
+from __futures__ import annotations
+
 import pathlib
 import importlib
 import urllib.parse
@@ -51,7 +53,10 @@ def load_rsciio(path: pathlib.Path):
     return result['data'], result['axes']
 
 
-def channel_dim_from_axes(axes: list[dict]):
+def channel_dim_from_axes(axes: list[dict] | None):
+    # axes is None if we used skimage to load the array
+    if axes is None:
+        return -1
     return tuple(
         axis['index_in_array']
         for axis in axes

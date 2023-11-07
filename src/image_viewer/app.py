@@ -1,3 +1,5 @@
+from __futures__ import annotations
+
 import numpy as np
 import panel as pn
 
