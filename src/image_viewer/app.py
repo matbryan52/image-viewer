@@ -11,21 +11,22 @@ from image_viewer.components import (
 
 def load_image() -> tuple[np.ndarray, dict]:
     supported_load = {
-        '?path=': load_local,
-        '?url=': load_url,
+        'path': load_local,
+        'url': load_url,
     }
 
     # seems to be a bug upstream where true URL hash
     # params is not synced to Python
-    url_hash = pn.state.location.search
-
-    if not isinstance(url_hash, str):
-        return default_image()
+    url_args = pn.state.session_args
 
     for key, loader in supported_load.items():
-        if url_hash.startswith(key):
+        if key in url_args:
             try:
-                return loader(url_hash)
+                arg = url_args[key][0].decode('utf-8')
+            except (IndexError, TypeError, UnicodeDecodeError):
+                continue
+            try:
+                return loader(arg)
             except LoadException:
                 pass
 
