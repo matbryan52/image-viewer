@@ -51,36 +51,12 @@ def load_rsciio(path: pathlib.Path):
     return result['data'], result['axes']
 
 
-def slice_into_channels(data: np.ndarray, axes: list[dict] | None) -> list[np.ndarray]:
-    if axes is None or not any(axis['navigate'] for axis in axes):
-        yield data
-    index_to_axis = {
-        axis['index_in_array']: axis
+def channel_dim_from_axes(axes: list[dict]):
+    return tuple(
+        axis['index_in_array']
         for axis in axes
-    }
-
-    # idea: slice `data` like this: build slicing items like
-    # (x, y, :, :)
-    # where each non-navigate axis is a `:`, the others are iterated over
-    # using `ndindex`
-
-    ndindex_shape = []
-    for idx, s in enumerate(data.shape):
-        axis = index_to_axis[idx]
-        if axis['navigate']:
-            ndindex_shape.append(s)
-
-    for idx_tuple in np.ndindex(*tuple(ndindex_shape)):
-        idx_lst = list(idx_tuple)
-        slice_ = []
-        for idx in range(len(index_to_axis)):
-            axis = index_to_axis[idx]
-            if axis['navigate']:
-                slice_.append(idx_lst[0])
-                idx_lst = idx_lst[1:]
-            else:
-                slice_.append(slice(None, None, None))
-        yield data[tuple(slice_)]
+        if axis['navigate']
+    )
 
 
 def load_local(url_hash) -> tuple[np.ndarray, dict]:
@@ -93,7 +69,12 @@ def load_local(url_hash) -> tuple[np.ndarray, dict]:
     except Exception as e:
         print(e)
         raise
-    return list(slice_into_channels(array, axes)), {'path': str(path), 'title': path.name}
+    meta = {
+        'path': str(path),
+        'title': path.name,
+        'channel_dimension': channel_dim_from_axes(axes),
+    }
+    return array, meta
 
 
 def load_url(url_hash) -> tuple[np.ndarray, dict]:
