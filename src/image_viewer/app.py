@@ -42,6 +42,7 @@ def viewer():
     figure = ApertureFigure.new(
         array,
         title=meta.get('title', None),
+        channel_dimension=meta.get('channel_dimension', -1),
     )
     return pn.Column(
         header_md,
