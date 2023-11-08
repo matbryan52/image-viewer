@@ -5,7 +5,7 @@ import panel as pn
 
 from libertem_ui.live_plot import ApertureFigure
 from image_viewer.components import (
-    load_local, load_url, LoadException, default_image,
+    load_local, default_image, LoadException, default_image,
 )
 
 
@@ -22,29 +22,41 @@ pn.config.authorize_callback = authorize
 def load_image() -> tuple[np.ndarray, dict]:
     supported_load = {
         'path': load_local,
-        'url': load_url,
+        'default': default_image,
     }
 
-    # seems to be a bug upstream where true URL hash
-    # params is not synced to Python
-    url_args = pn.state.session_args
+    if len(pn.state.session_args) == 0:
+        accepted = ', '.join("?" + k + "=" for k in supported_load.keys())
+        raise LoadException(f'Need load method in URL, accepts one of [``{accepted}``]')
 
-    for key, loader in supported_load.items():
-        if key in url_args:
-            try:
-                arg = url_args[key][0].decode('utf-8')
-            except (IndexError, TypeError, UnicodeDecodeError):
-                continue
-            try:
-                return loader(arg)
-            except LoadException:
-                pass
+    url_args = {
+        k: v for k, v
+        in pn.state.session_args.items()
+        if k in supported_load.keys()
+    }
 
-    return default_image()
+    if len(url_args) == 0:
+        raise LoadException('No compatible load method provided')
+
+    load_method = tuple(url_args.keys())[0]
+    try:
+        arg = url_args[load_method][0].decode('utf-8')
+    except (IndexError, KeyError, UnicodeDecodeError):
+        raise LoadException('Invalid URL load format')
+    loader = supported_load[load_method]
+    return loader(arg)
+
+
+def display_exception(md_pane: pn.pane.Markdown, exception: Exception):
+    md_pane.object = f"""
+**{type(exception).__name__}**: {str(exception)}
+
+**URL args**: {pn.state.session_args}
+"""
 
 
 def viewer():
-    header_md = pn.pane.Markdown(object=f"""
+    md = pn.pane.Markdown(object=f"""
 **File**: None
 """)
 
@@ -52,7 +64,7 @@ def viewer():
         title='Image Viewer',
         collapsed_sidebar=True,
     )
-    template.main.append(header_md)
+    template.main.append(md)
     fig_col = pn.Column(
         pn.indicators.LoadingSpinner(
             value=True, size=50, color='secondary', name='Loading...'
@@ -61,14 +73,18 @@ def viewer():
     template.main.append(fig_col)
 
     def do_onload():
-        array, meta = load_image()
+        try:
+            array, meta = load_image()
+        except Exception as e:
+            fig_col.clear()
+            return display_exception(md, e)
 
         figure = ApertureFigure.new(
             array,
             title=meta.get('title', None),
             channel_dimension=meta.get('channel_dimension', -1),
         )
-        header_md.object = f"""
+        md.object = f"""
 **File**: {meta.get('path', None)}
 """
         fig_col.clear()
