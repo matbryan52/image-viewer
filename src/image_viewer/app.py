@@ -37,8 +37,6 @@ def viewer():
     array, meta = load_image()
 
     header_md = pn.pane.Markdown(object=f"""
-# Image viewer
-
 **File**: {meta.get('path', None)}
 """)
 
@@ -47,10 +45,14 @@ def viewer():
         title=meta.get('title', None),
         channel_dimension=meta.get('channel_dimension', -1),
     )
-    return pn.Column(
-        header_md,
-        figure.layout,
+
+    template = pn.template.MaterialTemplate(
+        title='Image Viewer',
+        collapsed_sidebar=True,
     )
+    template.main.append(header_md)
+    template.main.append(figure.layout)
+    return template
 
 
 viewer().servable(title='Image viewer')
