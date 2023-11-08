@@ -9,6 +9,16 @@ from image_viewer.components import (
 )
 
 
+def authorize(user_info):
+    import sys
+    print(sys.argv)
+    print(user_info)
+    print(pn.state.headers)
+    return True
+
+pn.config.authorize_callback = authorize
+
+
 def load_image() -> tuple[np.ndarray, dict]:
     supported_load = {
         'path': load_local,
