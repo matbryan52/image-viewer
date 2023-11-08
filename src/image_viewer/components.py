@@ -4,9 +4,17 @@ import pathlib
 import importlib
 import urllib.parse
 
-from skimage.io import imread
-from rsciio import IO_PLUGINS
 import numpy as np
+import panel as pn
+
+
+IMAGE_SUFFIXES = (
+    '.jpg',
+    '.jpeg',
+    '.tif',
+    '.png',
+    '.bmp',
+)
 
 
 class LoadException(RuntimeError):
@@ -22,6 +30,7 @@ def default_image(*args) -> tuple[np.ndarray, dict]:
 
 
 def plugin_def_for_path(path: pathlib.Path):
+    from rsciio import IO_PLUGINS
     ext = path.suffix[1:]
     for plugin in IO_PLUGINS:
         if ext in plugin['file_extensions']:
@@ -32,14 +41,21 @@ def plugin_def_for_path(path: pathlib.Path):
 def load_rsciio(path: pathlib.Path):
     print(f"loading from {path}")
     plugin = plugin_def_for_path(path)
-    if plugin['name'] == 'Image':
-        # Simplifies handling of custom RGBA dtype
-        return imread(path, as_gray=True), None
     mod = importlib.import_module(plugin['api'])
     result = mod.file_reader(path)
     if isinstance(result, list):
         result = result[0]  # WTF
     return result['data'], result['axes']
+
+
+def load_raster_image(path):
+    from skimage.io import imread
+    return imread(path, as_gray=True).astype(np.float32), None
+
+
+def load_svg(path):
+    svg_pane = pn.pane.SVG(str(path), sizing_mode='stretch_height')
+    return svg_pane, {'path': str(path)}
 
 
 def channel_dim_from_axes(axes: list[dict] | None):
@@ -53,11 +69,18 @@ def channel_dim_from_axes(axes: list[dict] | None):
     )
 
 
-def load_local(path: str) -> tuple[np.ndarray, dict]:
+def load_local(path: str) -> tuple[np.ndarray | pn.viewable.Viewable, dict]:
     path = urllib.parse.unquote(path)
     path = pathlib.Path(path).expanduser().resolve()
     try:
-        array, axes = load_rsciio(path)
+        if path.suffix in IMAGE_SUFFIXES:
+            array, axes = load_raster_image(path)
+        elif path.suffix == '.svg':
+            # FIXME if we have an svg better to leave this function
+            # quickly but this should be refactored
+            return load_svg(path)
+        else:
+            array, axes = load_rsciio(path)
         print(f'loaded array of shape {array.shape} dtype {array.dtype}')
     except Exception as e:
         print(e)

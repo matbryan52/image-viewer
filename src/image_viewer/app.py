@@ -8,6 +8,9 @@ from image_viewer.components import (
     load_local, default_image, LoadException, default_image,
 )
 
+# maximum image display dimension (height / width according to aspect ratio)
+DISPLAY_DIM = 750
+
 
 def authorize(user_info):
     # Not sure why pn.state.cache puts the key in a tuple and returns a 2-tuple?
@@ -19,7 +22,7 @@ def authorize(user_info):
 pn.config.authorize_callback = authorize
 
 
-def load_image() -> tuple[np.ndarray, dict]:
+def load() -> tuple[np.ndarray | pn.viewable.Layoutable, dict]:
     supported_load = {
         'path': load_local,
         'default': default_image,
@@ -74,21 +77,33 @@ def viewer():
 
     def do_onload():
         try:
-            array, meta = load_image()
+            array, meta = load()
         except Exception as e:
             fig_col.clear()
             return display_exception(md, e)
 
-        figure = ApertureFigure.new(
-            array,
-            title=meta.get('title', None),
-            channel_dimension=meta.get('channel_dimension', -1),
-        )
+
+        if isinstance(array, np.ndarray):
+            figure = ApertureFigure.new(
+                array,
+                title=meta.get('title', None),
+                channel_dimension=meta.get('channel_dimension', -1),
+                maxdim=DISPLAY_DIM,
+            )
+            # Delay clearing until last moment to account for construct time
+            fig_col.clear()
+            fig_col.extend(figure.layout.objects)
+        else:
+            pane = array
+            pane.max_height = DISPLAY_DIM
+            pane.max_width = DISPLAY_DIM
+            # Delay clearing until last moment to account for construct time
+            fig_col.clear()
+            fig_col.append(pane)
+
         md.object = f"""
 **File**: {meta.get('path', None)}
 """
-        fig_col.clear()
-        fig_col.extend(figure.layout.objects)
 
     pn.state.onload(do_onload)
 
