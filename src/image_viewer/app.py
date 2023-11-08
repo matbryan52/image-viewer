@@ -46,24 +46,35 @@ def load_image() -> tuple[np.ndarray, dict]:
 
 
 def viewer():
-    array, meta = load_image()
-
     header_md = pn.pane.Markdown(object=f"""
-**File**: {meta.get('path', None)}
-""")
+**File**: None
 
-    figure = ApertureFigure.new(
-        array,
-        title=meta.get('title', None),
-        channel_dimension=meta.get('channel_dimension', -1),
-    )
+Loading...
+""")
 
     template = pn.template.MaterialTemplate(
         title='Image Viewer',
         collapsed_sidebar=True,
     )
     template.main.append(header_md)
-    template.main.append(figure.layout)
+    fig_col = pn.Column()
+    template.main.append(fig_col)
+
+    def do_onload():
+        array, meta = load_image()
+
+        figure = ApertureFigure.new(
+            array,
+            title=meta.get('title', None),
+            channel_dimension=meta.get('channel_dimension', -1),
+        )
+        header_md.object = f"""
+**File**: {meta.get('path', None)}
+"""
+        fig_col.extend(figure.layout.objects)
+
+    pn.state.onload(do_onload)
+
     return template
 
 
