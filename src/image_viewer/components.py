@@ -13,7 +13,7 @@ class LoadException(RuntimeError):
     ...
 
 
-def default_image() -> tuple[np.ndarray, dict]:
+def default_image(*args) -> tuple[np.ndarray, dict]:
     shape = (480, 640, 5)
     return (
         np.random.uniform(size=shape).astype(np.float32),
@@ -26,7 +26,7 @@ def plugin_def_for_path(path: pathlib.Path):
     for plugin in IO_PLUGINS:
         if ext in plugin['file_extensions']:
             return plugin
-    raise LoadException(f"unknown file extension: {ext}")
+    raise LoadException(f"unknown file extension: ``[{ext}]`` for path: ``[{str(path)}]``")
 
 
 def load_rsciio(path: pathlib.Path):
@@ -68,13 +68,3 @@ def load_local(path: str) -> tuple[np.ndarray, dict]:
         'channel_dimension': channel_dim_from_axes(axes),
     }
     return array, meta
-
-
-def load_url(url: str) -> tuple[np.ndarray, dict]:
-    # scikit-image can read directly from URL to greyscale numpy
-    # but it can't handle escaped urls ?
-    url = urllib.parse.unquote(url)
-    array = imread(url, as_gray=True)
-    components = urllib.parse.urlsplit(url)
-    title = components.path.split('/')[-1]
-    return array, {'url': url, 'title': title}
