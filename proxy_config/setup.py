@@ -10,7 +10,7 @@ setuptools.setup(
     license="MIT",
     repository="https://github.com/matbryan52/image-viewer",
     where='src',
-    dependencies=[
+    install_requires=[
         'jupyter-server-proxy'
     ],
     entry_points={
