@@ -46,8 +46,6 @@ def load_image() -> tuple[np.ndarray, dict]:
 def viewer():
     header_md = pn.pane.Markdown(object=f"""
 **File**: None
-
-Loading...
 """)
 
     template = pn.template.MaterialTemplate(
@@ -55,7 +53,11 @@ Loading...
         collapsed_sidebar=True,
     )
     template.main.append(header_md)
-    fig_col = pn.Column()
+    fig_col = pn.Column(
+        pn.indicators.LoadingSpinner(
+            value=True, size=50, color='secondary', name='Loading...'
+        )
+    )
     template.main.append(fig_col)
 
     def do_onload():
@@ -69,6 +71,7 @@ Loading...
         header_md.object = f"""
 **File**: {meta.get('path', None)}
 """
+        fig_col.clear()
         fig_col.extend(figure.layout.objects)
 
     pn.state.onload(do_onload)
