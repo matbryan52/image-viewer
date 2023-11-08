@@ -13,10 +13,8 @@ def authorize(user_info):
     # Not sure why pn.state.cache puts the key in a tuple and returns a 2-tuple?
     api_token, *_ =  pn.state.cache.get(('api_token',), (None,))
     api_key = pn.state.headers.get('X-Api-Key', None)
-    if api_token == api_key:
-        # True also if we aren't using token auth (i.e. None == None)
-        return True
-    return False
+    # True also if we aren't using token auth (i.e. None == None)
+    return api_token == api_key
 
 pn.config.authorize_callback = authorize
 
