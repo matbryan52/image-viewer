@@ -34,5 +34,8 @@ classifiers=[
     'Environment :: Console',
 ]
 
+[project.scripts]
+image-viewer = "image_viewer.cli:serve"
+
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -9,7 +9,7 @@ from tempfile import mkdtemp
 
 def _get_path():
     """
-    Gets the path to panel + the app or a wrapper script from config files:
+    Gets the path to the app or a wrapper script from config files:
 
     - {IMAGE_VIEWER_ROOT}/etc/image_viewer_jupyter_proxy.json
     - {sys.prefix}/etc/image_viewer_jupyter_proxy.json
@@ -19,51 +19,36 @@ def _get_path():
     prefix = os.environ.get("IMAGE_VIEWER_ROOT", sys.prefix)
     config_path = os.path.join(prefix, "etc", "image_viewer_jupyter_proxy.json")
     app_path = None
-    panel_path = None
 
     # first, look up path in config:
     if os.path.exists(config_path):
         with open(config_path, "r") as f:
             config = json.loads(f.read())
         app_path = config.get('app_path')
-        panel_path = config.get('panel_path')
 
     # if there is no config, or the config doesn't contain the key,
-    # check for image_viewer and panel in the current env
+    # check for image_viewer on PATH
     if app_path is None:
-        try:
-            from image_viewer import APP_FILE
-            app_path = APP_FILE
-        except (ImportError, ModuleNotFoundError):
-            pass
-    if panel_path is None:
-        panel_path = shutil.which("panel")
+        app_path = shutil.which("image-viewer")
 
     if app_path is None:
         raise FileNotFoundError("Could not find image-viewer in configuration "
                                 "or installed in this environment.")
 
-    if panel_path is None:
-        raise FileNotFoundError("Could not find panel installation in config "
-                                "or installed in this environment.")
-
-    return app_path, panel_path
+    return app_path
 
 
 def make_get_cmd(token):
 
     def _get_cmd(port):
         token_path = store_token(token)
-        app_path, panel_path = _get_path()
+        app_path = _get_path()
 
         cmd = [
-            str(panel_path),
-            "serve",
             str(app_path),
-            "--allow-websocket-origin=*",
             "--port",
             str(port),
-            "--args",
+            "--token-path",
             str(token_path),
         ]
 
