@@ -82,21 +82,27 @@ def viewer():
             fig_col.clear()
             return display_exception(md, e)
 
-
         if isinstance(array, np.ndarray):
-            figure = ApertureFigure.new(
-                array,
-                title=meta.get('title', None),
-                channel_dimension=meta.get('channel_dimension', -1),
-                maxdim=DISPLAY_DIM,
-            )
+            try:
+                figure = ApertureFigure.new(
+                    array,
+                    title=meta.get('title', None),
+                    channel_dimension=meta.get('channel_dimension', -1),
+                    maxdim=DISPLAY_DIM,
+                )
+            except Exception as e:
+                fig_col.clear()
+                return display_exception(md, e)
             # Delay clearing until last moment to account for construct time
             fig_col.clear()
             fig_col.extend(figure.layout.objects)
         else:
             pane = array
-            pane.max_height = DISPLAY_DIM
-            pane.max_width = DISPLAY_DIM
+            try:
+                pane.max_height = DISPLAY_DIM
+                pane.max_width = DISPLAY_DIM
+            except Exception as e:
+                pass
             # Delay clearing until last moment to account for construct time
             fig_col.clear()
             fig_col.append(pane)
