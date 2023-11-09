@@ -9,7 +9,7 @@ from image_viewer.components import (
 )
 
 # maximum image display dimension (height / width according to aspect ratio)
-DISPLAY_DIM = 750
+DISPLAY_DIM = 700
 
 
 def authorize(user_info):
