@@ -73,9 +73,9 @@ def load_local(path: str) -> tuple[np.ndarray | pn.viewable.Viewable, dict]:
     path = urllib.parse.unquote(path)
     path = pathlib.Path(path).expanduser().resolve()
     try:
-        if path.suffix in IMAGE_SUFFIXES:
+        if path.suffix.lower() in IMAGE_SUFFIXES:
             array, axes = load_raster_image(path)
-        elif path.suffix == '.svg':
+        elif path.suffix.lower() == '.svg':
             # FIXME if we have an svg better to leave this function
             # quickly but this should be refactored
             return load_svg(path)
