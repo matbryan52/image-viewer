@@ -22,7 +22,12 @@ RUN venv/bin/pip install --no-cache /code/
 
 ENV PYTHONUNBUFFERED 1
 
+RUN mkdir /data
+
 # image-viewer server
 EXPOSE 9732
 
 CMD ["/venv/bin/image-viewer", "--port", "9732"]
+
+# docker build -t image-viewer .
+# docker run -p 9732:9732 --mount type=bind,source="$(pwd)"/data,target=/data,readonly image-viewer
