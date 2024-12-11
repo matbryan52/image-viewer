@@ -4,8 +4,7 @@ FROM python:3.11-slim AS builder0
 RUN apt-get update && apt-get install -y \
     python3-venv \
     python3-pip \
-    git \
-    nodejs
+    git
 
 FROM builder0 as builder
 
