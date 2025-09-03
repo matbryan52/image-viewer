@@ -42,7 +42,7 @@ def load_rsciio(path: pathlib.Path):
     print(f"loading from {path}")
     plugin = plugin_def_for_path(path)
     mod = importlib.import_module(plugin['api'])
-    result = mod.file_reader(path)
+    result = mod.file_reader(str(path))
     if isinstance(result, list):
         result = result[0]  # WTF
     return result['data'], result['axes']
