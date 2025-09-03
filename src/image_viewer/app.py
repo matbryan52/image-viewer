@@ -1,4 +1,5 @@
 from __future__ import annotations
+import traceback
 
 import numpy as np
 import panel as pn
@@ -51,8 +52,11 @@ def load() -> tuple[np.ndarray | pn.viewable.Layoutable, dict]:
 
 
 def display_exception(md_pane: pn.pane.Markdown, exception: Exception):
+    tb = "\n".join(traceback.format_exception(exception))
     md_pane.object = f"""
 **{type(exception).__name__}**: {str(exception)}
+
+<code>{tb}</code>
 
 **URL args**: {pn.state.session_args}
 """
